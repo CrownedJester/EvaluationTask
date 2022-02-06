@@ -4,15 +4,153 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#E5E5E5"
     tools:context=".MainActivity">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.75" />
+
+    <ImageView
+        android:id="@+id/logo_bg"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:contentDescription="TODO"
+        android:padding="12dp"
+        android:src="@drawable/logo_bg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
+        android:id="@+id/screen_title"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:text="@string/locations"
+        android:textAllCaps="true"
+        android:textColor="@color/black"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="@id/logo_bg"
+        app:layout_constraintTop_toTopOf="@id/logo_bg" />
+
+    <View
+        android:id="@+id/background_view"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/shape_rounded_corner_white"
+        app:layout_constraintTop_toBottomOf="@+id/logo_bg" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/folder_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginHorizontal="16dp"
+        android:background="@drawable/shape_rounded_corner_gray"
+        android:text="Улицы"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@id/background_view"
+        app:layout_constraintEnd_toEndOf="@id/background_view"
+        app:layout_constraintStart_toStartOf="@id/background_view"
+        app:layout_constraintTop_toTopOf="@id/background_view" />
+
+    <View
+        android:id="@+id/rv_white_bg"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/shape_rounded_corner_white"
+        app:layout_constraintBottom_toBottomOf="@id/photos_rv"
+        app:layout_constraintTop_toBottomOf="@id/background_view" />
+
+    <View
+        android:id="@+id/rv_gray_bg"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        android:background="@drawable/shape_rounded_corner_gray"
+        app:layout_constraintBottom_toBottomOf="@id/rv_white_bg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/rv_white_bg" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/delete_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:background="@drawable/shape_rounded_corner_red"
+        android:paddingHorizontal="48dp"
+        android:paddingVertical="16dp"
+        android:text="Удалить"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@id/gl_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/gl_horizontal"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/subfolder_edit_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:background="@null"
+        android:drawableEnd="@drawable/ic_add_image"
+        android:hint="Название локации"
+        android:padding="16dp"
+        android:textAlignment="textStart"
+        android:textColor="#869495"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@id/folder_edit_text"
+        app:layout_constraintStart_toStartOf="@id/folder_edit_text"
+        app:layout_constraintTop_toBottomOf="@id/folder_edit_text"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/photos_rv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="8dp"
+        android:background="@android:color/transparent"
+        android:paddingBottom="32dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintBottom_toTopOf="@id/gl_horizontal"
+        app:layout_constraintEnd_toEndOf="@id/rv_gray_bg"
+        app:layout_constraintStart_toStartOf="@id/rv_gray_bg"
+        app:layout_constraintTop_toBottomOf="@id/subfolder_edit_text"
+        app:spanCount="3"
+        tools:listitem="@layout/item_photo" />
+
+    <ImageView
+        android:id="@+id/center_btn"
+        android:layout_width="@dimen/image_view_width"
+        android:layout_height="@dimen/image_view_height"
+        android:contentDescription="center btn"
+        android:src="@drawable/img_center_btn"
+        android:translationZ="90dp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
+        app:layout_constraintEnd_toEndOf="@id/bottom_nav"
+        app:layout_constraintStart_toStartOf="@id/bottom_nav"
+        app:layout_constraintTop_toTopOf="@id/bottom_nav" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:itemIconSize="32dp"
+        app:itemIconTint="@drawable/selector_bottom_nav"
+        app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:menu="@menu/menu_main" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

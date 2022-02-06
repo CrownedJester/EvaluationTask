@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/ic_settings"
+        android:title="Settings" />
+
+    <item
+        android:id="@+id/income"
+        android:icon="@drawable/ic_income"
+        android:title="Income" />
+
+    <item
+        android:id="@+id/placeholder"
+        android:title="" />
+
+    <item
+        android:id="@+id/dashboard"
+        android:icon="@drawable/ic_moodboard"
+        android:title="Moodboard" />
+
+    <item
+        android:id="@+id/locations"
+        android:checked="true"
+        android:icon="@drawable/ic_locations"
+        android:title="Locations" />
+</menu>

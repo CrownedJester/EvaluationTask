@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="bottom_nav_color_checked">#212020</color>
+    <color name="bottom_nav_color_unchecked">#CFD2CC</color>
+    <color name="checkbox_main_color">#CE6666</color>
 </resources>
