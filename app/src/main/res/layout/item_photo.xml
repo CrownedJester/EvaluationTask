@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="96dp"
     android:layout_height="96dp"
     android:layout_margin="8dp">
@@ -17,6 +18,8 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:gravity="end|center"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@id/photo_image_view"
-        app:layout_constraintTop_toTopOf="@id/photo_image_view" />
+        app:layout_constraintTop_toTopOf="@id/photo_image_view"
+        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>
