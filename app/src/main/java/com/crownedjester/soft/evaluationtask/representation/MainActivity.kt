@@ -1,4 +1,4 @@
-package com.crownedjester.soft.evaluationtask
+package com.crownedjester.soft.evaluationtask.representation
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
