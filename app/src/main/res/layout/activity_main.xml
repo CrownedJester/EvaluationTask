@@ -102,15 +102,27 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
         android:background="@null"
-        android:drawableEnd="@drawable/ic_add_image"
         android:hint="Название локации"
         android:padding="16dp"
         android:textAlignment="textStart"
         android:textColor="#869495"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@id/folder_edit_text"
+        app:layout_constraintEnd_toStartOf="@id/add_images_btn"
         app:layout_constraintStart_toStartOf="@id/folder_edit_text"
         app:layout_constraintTop_toBottomOf="@id/folder_edit_text"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageButton
+        android:id="@+id/add_images_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@null"
+        android:contentDescription="add_images_btn"
+        android:padding="16dp"
+        android:src="@drawable/ic_add_image"
+        app:layout_constraintBottom_toBottomOf="@id/subfolder_edit_text"
+        app:layout_constraintEnd_toEndOf="@id/rv_gray_bg"
+        app:layout_constraintTop_toTopOf="@id/subfolder_edit_text"
         app:layout_constraintVertical_bias="0.0" />
 
     <androidx.recyclerview.widget.RecyclerView
