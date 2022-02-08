@@ -6,7 +6,8 @@ import com.crownedjester.soft.evaluationtask.data.model.Image
 
 @Database(
     entities = [Image::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 abstract class ImagesDatabase : RoomDatabase() {
 
