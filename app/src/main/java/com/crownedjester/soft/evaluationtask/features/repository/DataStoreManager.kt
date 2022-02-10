@@ -26,7 +26,7 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
     override val folderTitle: Flow<String>
         get() = imagesDataStore.getValueAsFlow(DataStorePreferences.FOLDER_TITLE_KEY, "Улицы")
     override val subFolderTitle: Flow<String>
-        get() = imagesDataStore.getValueAsFlow(DataStorePreferences.SUBFOLDER_TITLE_KEY, "")
+        get() = imagesDataStore.getValueAsFlow(DataStorePreferences.SUBFOLDER_TITLE_KEY, "Подпапка")
 
     override suspend fun setFolderTitle(title: String) {
         imagesDataStore.setValue(DataStorePreferences.FOLDER_TITLE_KEY, title)
