@@ -9,16 +9,20 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.crownedjester.soft.evaluationtask.data.model.Image
 import com.crownedjester.soft.evaluationtask.databinding.ItemPhotoBinding
 
-class ImagesAdapter :
+
+private const val TAG = "ImagesAdapter"
+
+class ImagesAdapter(
+    private val adapterClickCallback: AdapterClickCallback
+) :
     RecyclerView.Adapter<ImagesAdapter.ImagesViewHolder>() {
 
-    private var _isCheckBoxesVisible = false
-    val isCheckBoxesVisible get() = _isCheckBoxesVisible
+    private var isCheckBoxesVisible: Boolean = false
 
     private val differCallBack = object : DiffUtil.ItemCallback<Image>() {
         override fun areItemsTheSame(oldItem: Image, newItem: Image): Boolean =
@@ -34,11 +38,18 @@ class ImagesAdapter :
     class ImagesViewHolder(val binding: ItemPhotoBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        @SuppressLint("CheckResult")
         fun bind(image: Image) {
 
-            binding.photoImageView.load(uri = Uri.parse(image.uriString)) {
-                transformations(RoundedCornersTransformation(16f))
-            }
+//            binding.photoImageView.load(image.uriString) {
+//                transformations(RoundedCornersTransformation(16f))
+//            }
+            binding.checkToDeleteCheckbox.isChecked = false
+
+            Glide.with(itemView)
+                .load(Uri.parse(image.uriString))
+                .transform(RoundedCorners(16))
+                .into(binding.photoImageView)
         }
 
     }
@@ -56,22 +67,29 @@ class ImagesAdapter :
 
         holder.binding.apply {
             checkToDeleteCheckbox.setOnClickListener {
-                photo.isChecked = checkToDeleteCheckbox.isChecked
+                photo?.isChecked = checkToDeleteCheckbox.isChecked
 
                 val countChecked = differ.currentList.count { image -> image.isChecked }
 
-                Log.i("ImageAdapter", "Count of checked images: $countChecked")
+                Log.i(TAG, "Count of checked images: $countChecked")
             }
 
             checkToDeleteCheckbox.visibility =
-                if (_isCheckBoxesVisible) View.VISIBLE else View.GONE
+                if (isCheckBoxesVisible) View.VISIBLE else View.GONE
 
         }
 
-        holder.itemView.setOnLongClickListener {
-            _isCheckBoxesVisible = !_isCheckBoxesVisible
+        adapterClickCallback.onListEmpty {
+            isCheckBoxesVisible = false
+            adapterClickCallback.onItemLongClicked(isCheckBoxesVisible)
+        }
 
-            if (!_isCheckBoxesVisible) {
+        holder.itemView.setOnLongClickListener {
+            isCheckBoxesVisible = !isCheckBoxesVisible
+            adapterClickCallback.onItemLongClicked(isCheckBoxesVisible)
+            Log.i(TAG, differ.currentList.toString())
+
+            if (!isCheckBoxesVisible) {
                 differ.currentList.forEach {
                     if (it.isChecked) {
                         it.isChecked = false
@@ -79,18 +97,18 @@ class ImagesAdapter :
                 }
                 val countChecked = differ.currentList.count { image -> image.isChecked }
 
-                Log.i("ImageAdapter", "Count of checked images: $countChecked")
+                Log.i(TAG, "Count of checked images: $countChecked")
             }
 
             notifyDataSetChanged()
             Log.i(
-                "PhotoAdapter",
-                if (_isCheckBoxesVisible) "Checkboxes are visible" else "checkboxes are invisible"
+                TAG,
+                if (isCheckBoxesVisible) "Checkboxes are visible" else "checkboxes are invisible"
             )
             true
         }
 
-        holder.bind(photo)
+        photo?.let { holder.bind(it) }
     }
 
     override fun getItemCount(): Int = differ.currentList.size
