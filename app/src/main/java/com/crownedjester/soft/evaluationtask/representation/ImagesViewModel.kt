@@ -1,16 +1,22 @@
 package com.crownedjester.soft.evaluationtask.representation
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.crownedjester.soft.evaluationtask.data.model.Image
 import com.crownedjester.soft.evaluationtask.domain.repository.DatabaseRepository
 import com.crownedjester.soft.evaluationtask.features.repository.DataStoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+
+private const val TAG = "ImagesViewModel"
 
 @HiltViewModel
 class ImagesViewModel @Inject constructor(
@@ -28,55 +34,61 @@ class ImagesViewModel @Inject constructor(
     val subFolderTitleStateFlow: StateFlow<String> = _subFolderTitleStateFlow
 
     init {
-        viewModelScope.launch {
-            getImages()
-            applyFolderTitle()
-            applySubFolderTitle()
-        }
+        getImages()
+        applyFolderTitle()
+        applySubFolderTitle()
     }
 
     fun addImage(uri: Uri) {
         viewModelScope.launch {
             val image = Image(uriString = uri.toString())
             databaseRepository.addImage(image)
+            Log.i(TAG, "Image $image successfully added")
         }
     }
 
     fun deleteImage(image: Image) {
         viewModelScope.launch {
             databaseRepository.deleteImage(image)
+            Log.i(TAG, "Image $image successfully deleted")
         }
     }
 
-    suspend fun getImages() {
-        databaseRepository.getImages().collect {
-            _imagesStateFlow.emit(it)
+    private fun getImages() =
+        viewModelScope.launch(Dispatchers.IO) {
+            databaseRepository.getImages().collectLatest {
+                _imagesStateFlow.emit(it)
+                Log.i(TAG, "Images loaded")
+            }
         }
-    }
 
     fun updateFolderTitle(title: String) {
         viewModelScope.launch {
             dataStoreRepository.setFolderTitle(title)
-            applyFolderTitle()
         }
     }
 
     fun updateSubFolderTitle(title: String) {
         viewModelScope.launch {
             dataStoreRepository.setSubFolderTitle(title)
-            applySubFolderTitle()
         }
     }
 
-    private suspend fun applyFolderTitle() {
-        dataStoreRepository.folderTitle.collect {
-            _folderTitleStateFlow.emit(it)
+    private fun applyFolderTitle() {
+        viewModelScope.launch(Dispatchers.IO) {
+            dataStoreRepository.folderTitle.collectLatest {
+                _folderTitleStateFlow.emit(it)
+                Log.i(TAG, "Folder updated to $it")
+            }
         }
     }
 
-    private suspend fun applySubFolderTitle() {
-        dataStoreRepository.subFolderTitle.collect {
-            _subFolderTitleStateFlow.emit(it)
+    private fun applySubFolderTitle() {
+        viewModelScope.launch(Dispatchers.IO) {
+            dataStoreRepository.subFolderTitle.collectLatest {
+                _subFolderTitleStateFlow.emit(it)
+                Log.i(TAG, "Subfolder updated to $it")
+            }
         }
     }
 }
