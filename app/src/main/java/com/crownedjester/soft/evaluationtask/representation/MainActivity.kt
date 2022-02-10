@@ -1,23 +1,28 @@
 package com.crownedjester.soft.evaluationtask.representation
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.crownedjester.soft.evaluationtask.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+
+private const val TAG = "MainActivity"
+
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AdapterClickCallback {
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
@@ -27,7 +32,9 @@ class MainActivity : AppCompatActivity() {
     private var requestPermissionLauncher: ActivityResultLauncher<String>? = null
     private var requestImagesRetrievingFromGallery: ActivityResultLauncher<String>? = null
 
+    private var adapter: ImagesAdapter = ImagesAdapter(this)
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
@@ -39,25 +46,79 @@ class MainActivity : AppCompatActivity() {
 
         initImagesRetrieverLauncher()
 
-        val adapter = ImagesAdapter()
-        binding.photosRv.adapter = adapter
-        lifecycleScope.launch {
+        binding.apply {
 
-            binding.addImagesBtn.setOnClickListener {
+            lifecycleScope.launch {
+                imagesViewModel.imagesStateFlow.collectLatest { images ->
+                    adapter.differ.submitList(images)
+                    Log.i(TAG, "List data updated")
+                }
+            }
+
+            lifecycleScope.launch {
+                imagesViewModel.folderTitleStateFlow.collectLatest { title ->
+                    folderEditText.setText(title)
+                    Log.i(TAG, "Folder title applied")
+                }
+            }
+
+            lifecycleScope.launch {
+                imagesViewModel.subFolderTitleStateFlow.collectLatest { title ->
+                    subfolderEditText.setText(title)
+                    Log.i(TAG, "SubFolder title applied")
+                }
+            }
+        }
+
+        binding.apply {
+            photosRv.adapter = adapter
+
+            addImagesBtn.setOnClickListener {
                 requestImagesRetrievingFromGallery?.launch("image/*")
             }
 
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-
-                imagesViewModel.imagesStateFlow.collectLatest { images ->
-                    adapter.differ.submitList(images)
+            deleteBtn.setOnClickListener {
+                adapter.differ.currentList.onEachIndexed { index, image ->
+                    if (image.isChecked) imagesViewModel.deleteImage(image)
                 }
+            }
 
-                binding.deleteBtn.visibility =
-                    if (adapter.isCheckBoxesVisible) View.VISIBLE else View.GONE
+            folderEditText.apply {
+                setOnEditorActionListener { view, actionId, _ ->
+                    var handled = false
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        clearFocus()
+                        (getSystemService(INPUT_METHOD_SERVICE) as (InputMethodManager)).hideSoftInputFromWindow(
+                            view.windowToken,
+                            0
+                        )
+                        imagesViewModel.updateFolderTitle(text.toString())
+                        handled = true
+                    }
+                    handled
+                }
+            }
 
+            subfolderEditText.apply {
+                setOnEditorActionListener { view, actionId, _ ->
+                    var handled = false
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        clearFocus()
+
+                        (getSystemService(INPUT_METHOD_SERVICE) as (InputMethodManager)).hideSoftInputFromWindow(
+                            view.windowToken,
+                            0
+                        )
+
+                        imagesViewModel.updateSubFolderTitle(text.toString())
+
+                        handled = true
+                    }
+                    handled
+                }
             }
         }
+
     }
 
     private fun initImagesRetrieverLauncher() {
@@ -83,6 +144,21 @@ class MainActivity : AppCompatActivity() {
                     ).show()
                 }
             }
+    }
+
+    override fun onItemLongClicked(isVisible: Boolean) {
+        binding.deleteBtn.visibility = if (isVisible) View.VISIBLE else View.INVISIBLE
+    }
+
+    override fun onListEmpty(onListEmptyCallback: () -> Unit) {
+        lifecycleScope.launch {
+            imagesViewModel.imagesStateFlow.collectLatest { images ->
+                if (images.isEmpty()) {
+                    onListEmptyCallback()
+                    Log.i(TAG, "Performed onListEmpty")
+                }
+            }
+        }
     }
 
     override fun onDestroy() {
