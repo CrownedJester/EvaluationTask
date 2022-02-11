@@ -1,7 +1,6 @@
 package com.crownedjester.soft.evaluationtask.representation
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +8,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.crownedjester.soft.evaluationtask.data.model.Image
 import com.crownedjester.soft.evaluationtask.databinding.ItemPhotoBinding
 
@@ -38,18 +37,14 @@ class ImagesAdapter(
     class ImagesViewHolder(val binding: ItemPhotoBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        @SuppressLint("CheckResult")
         fun bind(image: Image) {
 
-//            binding.photoImageView.load(image.uriString) {
-//                transformations(RoundedCornersTransformation(16f))
-//            }
+            binding.photoImageView.load(image.uriString) {
+                transformations(RoundedCornersTransformation(16f))
+            }
+
             binding.checkToDeleteCheckbox.isChecked = false
 
-            Glide.with(itemView)
-                .load(Uri.parse(image.uriString))
-                .transform(RoundedCorners(16))
-                .into(binding.photoImageView)
         }
 
     }

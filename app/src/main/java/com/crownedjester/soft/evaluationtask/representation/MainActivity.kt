@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
     private val imagesViewModel by viewModels<ImagesViewModel>()
 
     private var requestPermissionLauncher: ActivityResultLauncher<String>? = null
-    private var requestImagesRetrievingFromGallery: ActivityResultLauncher<String>? = null
+    private var requestImagesRetrievingFromGallery: ActivityResultLauncher<Array<String>>? = null
 
     private var adapter: ImagesAdapter = ImagesAdapter(this)
 
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
             photosRv.adapter = adapter
 
             addImagesBtn.setOnClickListener {
-                requestImagesRetrievingFromGallery?.launch("image/*")
+                requestImagesRetrievingFromGallery?.launch(arrayOf("image/*"))
             }
 
 
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
 
     private fun initImagesRetrieverLauncher() {
         requestImagesRetrievingFromGallery =
-            registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uriList ->
+            registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uriList ->
                 uriList?.onEach { currentUri ->
                     imagesViewModel.addImage(currentUri)
                 }
