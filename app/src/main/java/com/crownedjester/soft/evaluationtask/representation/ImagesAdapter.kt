@@ -79,15 +79,9 @@ class ImagesAdapter(
 
         }
 
-        adapterClickCallback.onListEmpty {
-            isCheckBoxesVisible = false
-            adapterClickCallback.onItemLongClicked(isCheckBoxesVisible)
-        }
-
         holder.itemView.setOnLongClickListener {
             isCheckBoxesVisible = !isCheckBoxesVisible
             adapterClickCallback.onItemLongClicked(isCheckBoxesVisible)
-            Log.i(TAG, differ.currentList.toString())
 
             if (!isCheckBoxesVisible) {
                 differ.currentList.forEach {
@@ -95,17 +89,21 @@ class ImagesAdapter(
                         it.isChecked = false
                     }
                 }
-                val countChecked = differ.currentList.count { image -> image.isChecked }
-
-                Log.i(TAG, "Count of checked images: $countChecked")
             }
 
             notifyDataSetChanged()
+
             Log.i(
                 TAG,
-                if (isCheckBoxesVisible) "Checkboxes are visible" else "checkboxes are invisible"
+                if (isCheckBoxesVisible) "Checkboxes are visible" else "Checkboxes are invisible"
             )
+
             true
+
+        }
+
+        adapterClickCallback.onDeleteButtonPressed {
+            holder.itemView.performLongClick()
         }
 
         photo?.let { holder.bind(it) }

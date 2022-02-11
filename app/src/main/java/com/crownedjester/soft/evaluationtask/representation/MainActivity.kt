@@ -77,11 +77,6 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
                 requestImagesRetrievingFromGallery?.launch("image/*")
             }
 
-            deleteBtn.setOnClickListener {
-                adapter.differ.currentList.onEachIndexed { index, image ->
-                    if (image.isChecked) imagesViewModel.deleteImage(image)
-                }
-            }
 
             folderEditText.apply {
                 setOnEditorActionListener { view, actionId, _ ->
@@ -150,14 +145,15 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
         binding.deleteBtn.visibility = if (isVisible) View.VISIBLE else View.INVISIBLE
     }
 
-    override fun onListEmpty(onListEmptyCallback: () -> Unit) {
-        lifecycleScope.launch {
-            imagesViewModel.imagesStateFlow.collectLatest { images ->
-                if (images.isEmpty()) {
-                    onListEmptyCallback()
-                    Log.i(TAG, "Performed onListEmpty")
-                }
+    override fun onDeleteButtonPressed(onAction: () -> Unit) {
+        binding.deleteBtn.setOnClickListener {
+            adapter.differ.currentList.onEach { image ->
+                if (image.isChecked) imagesViewModel.deleteImage(image)
             }
+
+            onAction()
+
+            Log.i(TAG, "Performed delete btn pressed")
         }
     }
 

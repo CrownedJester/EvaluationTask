@@ -4,6 +4,6 @@ interface AdapterClickCallback {
 
     fun onItemLongClicked(isVisible: Boolean)
 
-    fun onListEmpty(onListEmptyCallback: () -> Unit)
+    fun onDeleteButtonPressed(onAction: () -> Unit)
 
 }
