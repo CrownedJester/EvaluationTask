@@ -3,7 +3,6 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
-
 }
 
 android {
@@ -70,5 +69,8 @@ dependencies {
 
     //Data store preferences
     implementation "androidx.datastore:datastore-preferences:1.0.0"
+
+    //Toasty
+    implementation 'com.github.GrenderG:Toasty:1.5.2'
 
 }

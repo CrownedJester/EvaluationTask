@@ -1,6 +1,5 @@
 package com.crownedjester.soft.evaluationtask.representation
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
@@ -12,9 +11,11 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.size
 import androidx.lifecycle.lifecycleScope
 import com.crownedjester.soft.evaluationtask.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -29,7 +30,6 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
 
     private val imagesViewModel by viewModels<ImagesViewModel>()
 
-    private var requestPermissionLauncher: ActivityResultLauncher<String>? = null
     private var requestImagesRetrievingFromGallery: ActivityResultLauncher<Array<String>>? = null
 
     private var adapter: ImagesAdapter = ImagesAdapter(this)
@@ -39,10 +39,6 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        //check read storage permission
-        initRequestPermissionLauncher()
-        requestPermissionLauncher?.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
 
         initImagesRetrieverLauncher()
 
@@ -71,12 +67,14 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
         }
 
         binding.apply {
+
             photosRv.adapter = adapter
+
+            bottomNav.menu.getItem(bottomNav.menu.size - 1).isChecked = true
 
             addImagesBtn.setOnClickListener {
                 requestImagesRetrievingFromGallery?.launch(arrayOf("image/*"))
             }
-
 
             folderEditText.apply {
                 setOnEditorActionListener { view, actionId, _ ->
@@ -89,6 +87,13 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
                         )
                         imagesViewModel.updateFolderTitle(text.toString())
                         handled = true
+
+                        Toasty.success(
+                            this@MainActivity,
+                            "Название папки изменено!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
                     }
                     handled
                 }
@@ -108,6 +113,12 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
                         imagesViewModel.updateSubFolderTitle(text.toString())
 
                         handled = true
+
+                        Toasty.success(
+                            this@MainActivity,
+                            "Название подпапки изменено!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                     handled
                 }
@@ -122,27 +133,18 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
                 uriList?.onEach { currentUri ->
                     imagesViewModel.addImage(currentUri)
                 }
-            }
-    }
-
-    private fun initRequestPermissionLauncher() {
-        requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-                if (isGranted) {
-                    Toast.makeText(this, "All Permissions Granted!", Toast.LENGTH_LONG)
-                        .show()
-                } else {
-                    Toast.makeText(
-                        this,
-                        "Important permission was denied",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                if (uriList.isNotEmpty()) {
+                    Toasty.success(this, "Изображения успешно добавлены").show()
                 }
             }
     }
 
     override fun onItemLongClicked(isVisible: Boolean) {
         binding.deleteBtn.visibility = if (isVisible) View.VISIBLE else View.INVISIBLE
+        if (isVisible) {
+            Toasty.info(this, "Удерживайте повторно, чтобы скрыть!", Toasty.LENGTH_LONG).show()
+
+        }
     }
 
     override fun onDeleteButtonPressed(onAction: () -> Unit) {
@@ -152,6 +154,8 @@ class MainActivity : AppCompatActivity(), AdapterClickCallback {
             }
 
             onAction()
+
+            Toasty.success(this, "Изображения удалены!", Toasty.LENGTH_LONG).show()
 
             Log.i(TAG, "Performed delete btn pressed")
         }

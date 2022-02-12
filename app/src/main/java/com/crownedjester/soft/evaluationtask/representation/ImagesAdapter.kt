@@ -43,7 +43,8 @@ class ImagesAdapter(
                 transformations(RoundedCornersTransformation(16f))
             }
 
-            binding.checkToDeleteCheckbox.isChecked = false
+            binding.checkToDeleteCheckbox.setOnCheckedChangeListener(null)
+            binding.checkToDeleteCheckbox.isChecked = image.isChecked
 
         }
 
@@ -59,6 +60,8 @@ class ImagesAdapter(
     @SuppressLint("NotifyDataSetChanged")
     override fun onBindViewHolder(holder: ImagesViewHolder, position: Int) {
         val photo = differ.currentList[position]
+
+        holder.binding.checkToDeleteCheckbox.isChecked = photo.isChecked
 
         holder.binding.apply {
             checkToDeleteCheckbox.setOnClickListener {
